@@ -1,0 +1,25 @@
+class Agenda {
+  private compromissos: string[];
+
+  constructor() {
+    this.compromissos = [];
+  }
+
+  adicionar(compromisso: string): void {
+    this.compromissos.push(compromisso);
+  }
+
+  listar(): string[] {
+    return this.compromissos;
+  }
+}
+
+// Exemplo de uso
+const agenda = new Agenda();
+
+agenda.adicionar("Reunião às 10h");
+agenda.adicionar("Dentista às 14h");
+agenda.adicionar("Chamada com cliente às 16h");
+
+console.log(agenda.listar());
+// Output: ["Reunião às 10h", "Dentista às 14h", "Chamada com cliente às 16h"]
