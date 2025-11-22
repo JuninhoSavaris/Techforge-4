@@ -1,0 +1,260 @@
+Trilha 5
+
+Exercicio 1
+
+// Tipo padrão de tarefa
+interface Tarefa {
+  descricao: string;
+  tipo: "projeto" | "diaria";
+}
+
+// Classe abstrata
+abstract class TaskManager {
+  protected tasks: Tarefa[] = [];
+
+  abstract addTask(task: string): void;
+
+  listTasks(): string[] {
+    return this.tasks.map(t => `${t.tipo.toUpperCase()}: ${t.descricao}`);
+  }
+
+  // Método auxiliar para evitar duplicados
+  protected existeTarefa(descricao: string): boolean {
+    return this.tasks.some(t => t.descricao.toLowerCase() === descricao.toLowerCase());
+  }
+}
+
+// Subclasse: Tarefas de Projeto
+class Project extends TaskManager {
+  addTask(task: string): void {
+    if (this.existeTarefa(task)) {
+      console.log(`⚠ A tarefa "${task}" já existe no projeto!`);
+      return;
+    }
+
+    this.tasks.push({ descricao: task, tipo: "projeto" });
+  }
+}
+
+// Subclasse: Tarefas Diárias
+class DailyTasks extends TaskManager {
+  addTask(task: string): void {
+    if (this.existeTarefa(task)) {
+      console.log(`⚠ A tarefa diária "${task}" já foi adicionada!`);
+      return;
+    }
+
+    this.tasks.push({ descricao: task, tipo: "diaria" });
+  }
+}
+
+// ---------- EXEMPLO DE USO ----------
+
+const projeto = new Project();
+projeto.addTask("Desenvolver API");
+projeto.addTask("Criar testes");
+projeto.addTask("Desenvolver API"); // duplicada
+
+const tarefasDiarias = new DailyTasks();
+tarefasDiarias.addTask("Ler emails");
+tarefasDiarias.addTask("Planejar dia");
+tarefasDiarias.addTask("Ler emails"); // duplicada
+
+console.log("\n📌 Tarefas do Projeto:");
+console.log(projeto.listTasks());
+
+console.log("\n📆 Tarefas Diárias:");
+console.log(tarefasDiarias.listTasks());
+
+
+Exercicio 2
+
+// Classe Abstrata
+abstract class Inventory {
+  protected items: Record<string, number> = {};
+
+  abstract addItem(item: string, quantity: number): void;
+  abstract removeItem(item: string): void;
+  abstract getInventory(): Record<string, number>;
+}
+
+// Subclasse: Depósito (Armazém) — grandes quantidades
+class WarehouseInventory extends Inventory {
+  addItem(item: string, quantity: number): void {
+    if (quantity <= 0) return;
+    
+    this.items[item] = (this.items[item] || 0) + quantity;
+  }
+
+  removeItem(item: string): void {
+    delete this.items[item];
+  }
+
+  getInventory(): Record<string, number> {
+    return { ...this.items };
+  }
+}
+
+// Subclasse: Loja — limite de quantidade por item
+class StoreInventory extends Inventory {
+  private readonly LIMITE_ITEM = 10;
+
+  addItem(item: string, quantity: number): void {
+    if (quantity <= 0) return;
+
+    const atual = this.items[item] || 0;
+    let novoTotal = atual + quantity;
+
+    if (novoTotal > this.LIMITE_ITEM) {
+      console.log(
+        `⚠ Limite excedido: O item "${item}" não pode ultrapassar ${this.LIMITE_ITEM} unidades.`
+      );
+      novoTotal = this.LIMITE_ITEM;
+    }
+
+    this.items[item] = novoTotal;
+  }
+
+  removeItem(item: string): void {
+    delete this.items[item];
+  }
+
+  getInventory(): Record<string, number> {
+    return { ...this.items };
+  }
+}
+
+// ------------------ EXEMPLO DE USO ------------------
+
+const warehouse = new WarehouseInventory();
+warehouse.addItem("Ferro", 500);
+warehouse.addItem("Madeira", 1200);
+warehouse.addItem("Ferro", 200);
+console.log("📦 Estoque do Depósito:", warehouse.getInventory());
+
+const loja = new StoreInventory();
+loja.addItem("Poção", 5);
+loja.addItem("Poção", 8); // tenta ultrapassar limite
+loja.addItem("Espada", 3);
+console.log("🏪 Estoque da Loja:", loja.getInventory());
+
+
+Exercicio 3
+
+// Classe Abstrata
+abstract class FavoriteManager {
+  protected favorites: string[] = [];
+
+  abstract addFavorite(item: string): void;
+  abstract getFavorites(): string[];
+}
+
+// Subclasse: Gerenciador de Filmes Favoritos
+class MoviesFavoriteManager extends FavoriteManager {
+  addFavorite(movie: string): void {
+    // Impedir duplicatas
+    if (this.favorites.includes(movie)) {
+      console.log(`⚠ O filme "${movie}" já está na lista de favoritos.`);
+      return;
+    }
+
+    this.favorites.push(movie);
+
+    // Ordenar alfabeticamente
+    this.favorites.sort((a, b) => a.localeCompare(b));
+  }
+
+  getFavorites(): string[] {
+    return [...this.favorites];
+  }
+}
+
+// Subclasse: Gerenciador de Livros Favoritos
+class BooksFavoriteManager extends FavoriteManager {
+  addFavorite(book: string): void {
+    // Inserir sempre no início
+    this.favorites.unshift(book);
+  }
+
+  getFavorites(): string[] {
+    return [...this.favorites];
+  }
+}
+
+// ------------------ EXEMPLO DE USO ------------------
+
+const movies = new MoviesFavoriteManager();
+movies.addFavorite("Interestelar");
+movies.addFavorite("O Senhor dos Anéis");
+movies.addFavorite("Avatar");
+movies.addFavorite("Avatar"); // duplicado
+
+console.log("🎬 Filmes Favoritos:", movies.getFavorites());
+
+const books = new BooksFavoriteManager();
+books.addFavorite("Dom Quixote");
+books.addFavorite("1984");
+books.addFavorite("O Hobbit");
+
+console.log("📚 Livros Favoritos:", books.getFavorites());
+
+
+Exercicio 4
+
+// Classe Abstrata
+abstract class VoteSystem {
+  protected votes: Record<string, number> = {};
+
+  abstract voteFor(candidate: string): void;
+  abstract getResults(): object;
+}
+
+// Subclasse: Election
+// Retorna o total de votos por candidato em um objeto
+class Election extends VoteSystem {
+  voteFor(candidate: string): void {
+    if (!this.votes[candidate]) {
+      this.votes[candidate] = 0;
+    }
+    this.votes[candidate]++;
+  }
+
+  getResults(): object {
+    return { ...this.votes };
+  }
+}
+
+// Subclasse: Poll
+// Retorna os candidatos ordenados do mais votado para o menos votado
+class Poll extends VoteSystem {
+  voteFor(candidate: string): void {
+    if (!this.votes[candidate]) {
+      this.votes[candidate] = 0;
+    }
+    this.votes[candidate]++;
+  }
+
+  getResults(): { candidate: string; votes: number }[] {
+    return Object.entries(this.votes)
+      .map(([candidate, votes]) => ({ candidate, votes }))
+      .sort((a, b) => b.votes - a.votes); // ordenar por votos decrescente
+  }
+}
+
+// ------------------ EXEMPLO DE USO ------------------
+
+const election = new Election();
+election.voteFor("Alice");
+election.voteFor("Bob");
+election.voteFor("Alice");
+
+console.log("📊 Resultado da Eleição:", election.getResults());
+
+const poll = new Poll();
+poll.voteFor("João");
+poll.voteFor("Maria");
+poll.voteFor("João");
+poll.voteFor("João");
+poll.voteFor("Maria");
+
+console.log("📈 Ranking da Enquete:", poll.getResults());
