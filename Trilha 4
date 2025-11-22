@@ -1,0 +1,186 @@
+Exercicio 1
+
+// Interface Produto
+interface Produto {
+  id: number;
+  nome: string;
+  preco: number;
+}
+
+// Classe que implementa a interface
+class ItemLoja implements Produto {
+  id: number;
+  nome: string;
+  preco: number;
+
+  constructor(id: number, nome: string, preco: number) {
+    this.id = id;
+    this.nome = nome;
+    this.preco = preco;
+  }
+}
+
+// Exemplo de uso
+const item = new ItemLoja(1, "Camiseta", 49.90);
+console.log(item);
+
+
+Exercico 2
+
+// Interface Documento
+interface Documento {
+  titulo: string;
+  conteudo: string;
+}
+
+// Classe que implementa a interface
+class Texto implements Documento {
+  titulo: string;
+  conteudo: string;
+
+  constructor(titulo: string, conteudo: string) {
+    this.titulo = titulo;
+    this.conteudo = conteudo;
+  }
+
+  exibir(): string {
+    return `Título: ${this.titulo}, Conteúdo: ${this.conteudo}`;
+  }
+}
+
+// Exemplo de uso
+const documento = new Texto("Contrato", "Este documento oficializa o acordo.");
+console.log(documento.exibir());
+
+
+Exercicio 3
+
+// Interface ProdutoLoja
+interface ProdutoLoja {
+  codigo: number;
+  nome: string;
+}
+
+// Classe Loja
+class Loja {
+  private produtos: ProdutoLoja[];
+
+  constructor() {
+    this.produtos = [];
+  }
+
+  // Método para adicionar produtos (opcional, mas útil)
+  adicionarProduto(produto: ProdutoLoja): void {
+    this.produtos.push(produto);
+  }
+
+  // Método para buscar produto pelo código
+  buscarProdutoPorCodigo(codigo: number): ProdutoLoja | undefined {
+    return this.produtos.find(produto => produto.codigo === codigo);
+  }
+}
+
+// Exemplo de uso
+const loja = new Loja();
+
+loja.adicionarProduto({ codigo: 1, nome: "Teclado" });
+loja.adicionarProduto({ codigo: 2, nome: "Mouse" });
+loja.adicionarProduto({ codigo: 3, nome: "Monitor" });
+
+console.log(loja.buscarProdutoPorCodigo(2)); // { codigo: 2, nome: "Mouse" }
+console.log(loja.buscarProdutoPorCodigo(99)); // undefined
+
+
+Exercicio 4
+
+// Interface Livro
+interface Livro {
+  titulo: string;
+  autor: string;
+  disponivel: boolean;
+}
+
+// Classe Biblioteca
+class Biblioteca {
+  private livros: Livro[];
+
+  constructor() {
+    this.livros = [];
+  }
+
+  // Método opcional para adicionar livros
+  adicionarLivro(livro: Livro): void {
+    this.livros.push(livro);
+  }
+
+  // Método que retorna apenas livros disponíveis
+  buscarLivrosDisponiveis(): Livro[] {
+    return this.livros.filter(livro => livro.disponivel === true);
+  }
+}
+
+// Exemplo de uso
+const biblioteca = new Biblioteca();
+
+biblioteca.adicionarLivro({ titulo: "Dom Casmurro", autor: "Machado de Assis", disponivel: true });
+biblioteca.adicionarLivro({ titulo: "O Hobbit", autor: "J.R.R. Tolkien", disponivel: false });
+biblioteca.adicionarLivro({ titulo: "1984", autor: "George Orwell", disponivel: true });
+
+console.log(biblioteca.buscarLivrosDisponiveis());
+// Output esperado: [
+//   { titulo: "Dom Casmurro", autor: "Machado de Assis", disponivel: true },
+//   { titulo: "1984", autor: "George Orwell", disponivel: true }
+// ]
+
+Exercicio 5
+
+// Interface LivroBiblioteca
+interface LivroBiblioteca {
+  titulo: string;
+  autor: string;
+  genero: string;
+  disponivel: boolean;
+}
+
+// Classe BibliotecaGestao
+class BibliotecaGestao {
+  private livros: LivroBiblioteca[];
+
+  constructor() {
+    this.livros = [];
+  }
+
+  // Método opcional para adicionar livros
+  adicionarLivro(livro: LivroBiblioteca): void {
+    this.livros.push(livro);
+  }
+
+  // 1️⃣ Filtrar por gênero
+  filtrarPorGenero(genero: string): LivroBiblioteca[] {
+    return this.livros.filter(livro => livro.genero.toLowerCase() === genero.toLowerCase());
+  }
+
+  // 2️⃣ Buscar por autor
+  buscarPorAutor(autor: string): LivroBiblioteca[] {
+    return this.livros.filter(livro => livro.autor.toLowerCase() === autor.toLowerCase());
+  }
+
+  // 3️⃣ Retornar livros disponíveis ordenados alfabeticamente pelo título
+  obterLivrosDisponiveisOrdenados(): LivroBiblioteca[] {
+    return this.livros
+      .filter(livro => livro.disponivel)
+      .sort((a, b) => a.titulo.localeCompare(b.titulo));
+  }
+}
+
+// Exemplo de uso
+const sistema = new BibliotecaGestao();
+
+sistema.adicionarLivro({ titulo: "Dom Casmurro", autor: "Machado de Assis", genero: "Romance", disponivel: true });
+sistema.adicionarLivro({ titulo: "1984", autor: "George Orwell", genero: "Distopia", disponivel: false });
+sistema.adicionarLivro({ titulo: "O Hobbit", autor: "J.R.R. Tolkien", genero: "Fantasia", disponivel: true });
+sistema.adicionarLivro({ titulo: "O Senhor dos Anéis", autor: "J.R.R. Tolkien", genero: "Fantasia", disponivel: true });
+
+console.log("📚 Fantasia:", sistema.filtrarPorGenero("Fantasia"));
+console.log("👤 Tolkien:", sistema.buscarPorAutor("J.R.R. Tolkien"));
+console.log("✔ Disponíveis ordenados:", sistema.obterLivrosDisponiveisOrdenados());
