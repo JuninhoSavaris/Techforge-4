@@ -1,0 +1,175 @@
+Trilha 6
+
+Exercicio 1
+
+Inicial
+class Order {
+  private items: { name: string; price: number }[] = [];
+  private totalPrice: number = 0;
+  private paymentStatus: string = "PENDING";
+  private shippingStatus: string = "NOT_SHIPPED";
+
+  addItem(item: { name: string; price: number }): void {
+    this.items.push(item);
+    this.totalPrice += item.price;
+  }
+
+  processPayment(): void {
+    if (this.totalPrice > 0) {
+      this.paymentStatus = "PAID";
+      console.log("Pagamento realizado com sucesso!");
+    } else {
+      console.log("Não há itens no pedido.");
+    }
+  }
+
+  updateShippingStatus(status: string): void {
+    this.shippingStatus = status;
+  }
+
+  getSummary() {
+    return {
+      items: this.items,
+      total: this.totalPrice,
+      paymentStatus: this.paymentStatus,
+      shippingStatus: this.shippingStatus,
+    };
+  }
+}
+
+Refatorada
+class Cart {
+  private items: { name: string; price: number }[] = [];
+
+  addItem(item: { name: string; price: number }) {
+    this.items.push(item);
+  }
+
+  getItems() {
+    return this.items;
+  }
+
+  getTotalPrice(): number {
+    return this.items.reduce((total, item) => total + item.price, 0);
+  }
+}
+
+Exercicio 2
+
+Inicial
+class UserManager {
+  private users: { name: string; email: string }[] = [];
+
+  createUser(name: string, email: string): void {
+    const user = { name, email };
+    this.users.push(user);
+
+    console.log(`Usuário criado: ${name}`);
+
+    // Lógica de notificação dentro da classe (acoplamento)
+    this.sendEmailNotification(email, "Bem-vindo!", "Sua conta foi criada.");
+  }
+
+  private sendEmailNotification(email: string, subject: string, message: string) {
+    console.log(`Enviando email para ${email}...`);
+    console.log(`Assunto: ${subject}`);
+    console.log(`Mensagem: ${message}`);
+  }
+
+  listUsers() {
+    return this.users;
+  }
+}
+
+Refatorada
+
+class EmailNotification {
+  send(email: string, subject: string, message: string) {
+    console.log(`📧 Enviando email para ${email}`);
+    console.log(`Assunto: ${subject}`);
+    console.log(`Mensagem: ${message}`);
+  }
+}
+
+class UserManager {
+  private users: { name: string; email: string }[] = [];
+
+  constructor(private notifier: EmailNotification) {}
+
+  createUser(name: string, email: string): void {
+    const user = { name, email };
+    this.users.push(user);
+
+    console.log(`Usuário criado: ${name}`);
+
+    // Delegando notificação
+    this.notifier.send(email, "Bem-vindo!", "Sua conta foi criada.");
+  }
+
+  listUsers() {
+    return this.users;
+  }
+}
+
+const emailService = new EmailNotification();
+const userManager = new UserManager(emailService);
+
+userManager.createUser("João", "joao@email.com");
+console.log(userManager.listUsers());
+
+Exercicio 3
+
+Inicial
+
+class EmailSender {
+  sendEmail(email: string, mensagem: string): void {
+    if (!this.validarContato(email)) {
+      console.log("❌ Email inválido. Envio cancelado.");
+      return;
+    }
+
+    console.log(`📧 Enviando email para ${email}...`);
+    console.log(`Mensagem: ${mensagem}`);
+  }
+
+  private validarContato(email: string): boolean {
+    // Validação bem simples
+    return email.includes("@") && email.includes(".");
+  }
+}
+
+// Exemplo de uso
+const sender = new EmailSender();
+sender.sendEmail("teste@email.com", "Olá mundo!");
+
+
+Refatorada
+
+class ContactValidator {
+  isValidEmail(email: string): boolean {
+    return email.includes("@") && email.includes(".");
+  }
+}
+
+
+class EmailSender {
+  constructor(private validator: ContactValidator) {}
+
+  sendEmail(email: string, mensagem: string): void {
+    if (!this.validator.isValidEmail(email)) {
+      console.log("❌ Email inválido. Envio cancelado.");
+      return;
+    }
+
+    console.log(`📨 Email enviado para ${email}`);
+    console.log(`Mensagem: ${mensagem}`);
+  }
+}
+
+
+const validator = new ContactValidator();
+const sender = new EmailSender(validator);
+
+sender.sendEmail("usuario@email.com", "Bem-vindo!");
+sender.sendEmail("email-invalido", "Teste");
+
